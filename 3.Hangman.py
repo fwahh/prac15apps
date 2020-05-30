@@ -10,6 +10,7 @@ wordlength = 0
 minimumletters = 4
 turns = 10
 correctGuesses = "" #to keep track of correct letters guessed, intialized outside of loop
+wrongGuesses = "" #to keep track of wrong letters
 validLetters = "abcdefghijklmnopqrstuvwxyz"
 correctWord = random.choice(wordlist)
 
@@ -22,7 +23,7 @@ def SaneWord(word):
     return True
 
 #to ensure the populated word is not too short and doesn't have weird char
-while wordlength <= minimumletters and SaneWord(correctWord) != True:
+while wordlength <= minimumletters or SaneWord(correctWord) != True:
     correctWord = random.choice(wordlist)
     wordlength = len(correctWord)
 
@@ -80,7 +81,7 @@ print("The king's thinking of: " + "_ "*len(correctWord))
 print("-"*80)
 #start the loop
 while len(correctWord) >= minimumletters:
-    guess = input("Enter a letter to guess\n")
+    guess = input("Enter a letter to guess:\n")
     currentStatus = ""
 
     if guess not in validLetters or len(guess) > 1: #check validity of input
@@ -88,6 +89,9 @@ while len(correctWord) >= minimumletters:
         print("-"*80)
     elif guess in correctGuesses:
         print ("You have already guessed that!")
+        print("-"*80)
+    elif guess in wrongGuesses:
+        print ("You have already guessed that! And it was incorrect, fool!")
         print("-"*80)
     else:
         if guess in correctWord:
@@ -109,7 +113,9 @@ while len(correctWord) >= minimumletters:
             print("You guessed right! Good job! Keep going!")
             print("-"*80)
         else:
-            print("Nooo, that was a mistake")
+            wrongGuesses = wrongGuesses + guess
+            print("Nooo, that was a mistake. ")
+            print("Incorrect guesses so far:", sorted(list(wrongGuesses)))
             turns -= 1
             PrintHangman(turns)
             if turns == 0:
