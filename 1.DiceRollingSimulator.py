@@ -30,13 +30,17 @@ def printDice(value):  #function to print the dice depending on the value fed in
         print (' '+'|'+' '*2 + 'o' +' '*3 + 'o' +' '*2+ '|')
 
     print(' '+'-'*11)
-flag = 'y'
 # Following is for user interaction
-flag = input("Hello traveller, this is a random dice simulator, if you would like to give it a try, please enter the 'y' key.")
-while flag == 'y':
-    diceValue = random.randint(1,6)
-    printDice(diceValue)
-    flag = input("You have chosen to roll the die, if you would like to continue, enter the 'y' key again.")
+print("\n")
+flag = input("Hello traveller, this is a random dice simulator, if you would like to give it a try, please click on 'Enter'")
+while True:
 
-if flag != 'y':
-    print('You have chosen not to continue. I bid you good day.')
+    if not flag:
+        diceValue = random.randint(1,6)
+        printDice(diceValue)
+    else:
+        print('You have chosen not to continue. I bid you good day.')
+        break
+    flag = input("You have chosen to roll the die.\n" +
+    "If you would like to continue, click on 'Enter' again." +
+    " Else, simply enter any other key.")
