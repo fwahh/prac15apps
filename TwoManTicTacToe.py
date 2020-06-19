@@ -1,4 +1,3 @@
-#to print Board
 def printBoard(gameEntry):
     borders = "---------"
     print(borders)
@@ -6,37 +5,28 @@ def printBoard(gameEntry):
         print("| " + " ".join(row) + " |")
     print(borders)
 
-# functions to check game state
 def isWinner(gameEntry, playerMove):
     # check for vertical wins
     for j in range(3):
-        if(gameEntry[0][j] == gameEntry[1][j] and
-            gameEntry[1][j] == gameEntry[2][j] and
-            gameEntry[2][j] == playerMove):
+        if(gameEntry[0][j] == gameEntry[1][j] == gameEntry[2][j] == playerMove):
             return True
     # check for horizontal wins
     for row in gameEntry:
         if set(row) == {playerMove}:
             return True
     #check for diagonal wins
-    if ((gameEntry[0][0] == gameEntry[1][1] and
-        gameEntry[1][1] == gameEntry[2][2] and
-        gameEntry[2][2] == playerMove) or
-        (gameEntry[2][0] == gameEntry[1][1] and
-        gameEntry[1][1] == gameEntry[0][2] and
-        gameEntry[0][2] == playerMove)):
+    if ((gameEntry[0][0] == gameEntry[1][1] == gameEntry[2][2] == playerMove) or
+        (gameEntry[2][0] == gameEntry[1][1] == gameEntry[0][2] == playerMove)):
         return True
 
 def isDraw():
     return all([entry != " " for row in gameEntry for entry in row])
 
 def placeMove(i , j, playerMove):
-    # i goes from left to right and j goes from bottom to top.
+    # i denotes row and j denotes column, both start from 1
     if gameEntry[i - 1][j - 1] == " ":
         gameEntry[i - 1][j - 1] = playerMove
         return True
-    else:
-        return False
 
 def promptEntry(playerMove):
     i, j = 0, 0
