@@ -78,34 +78,26 @@ class TicTacToe:
         oppoMove = "O" if aiMove == "X" else "X"
         scorebook = {i: board[:] for i in range(9) if board[i] == " "}
         for moveIndex, copiedBoard in scorebook.items():
-            copiedBoard[moveIndex] = aiMove
+            copiedBoard[moveIndex] = aiMove if callLevel % 2 == 0 else oppoMove
             if self.isWinner(aiMove, copiedBoard):
                 scorebook[moveIndex] = 10
             elif self.isWinner(oppoMove, copiedBoard):
                 scorebook[moveIndex] = -10
             elif self.isDraw(copiedBoard):
                 scorebook[moveIndex] = 0
-
-        #base case
-        if all(value in (10,0,-10) for value in scorebook.values()):
-            if callLevel % 2 == 0:
-                return max(scorebook, key = lambda k: scorebook[k])
             else:
-                return min(scorebook, key = lambda k: scorebook[k])
+                moveNum, movevalue = self.minimaxAlgo(aiMove,
+                    copiedBoard, callLevel + 1)
+                scorebook[moveIndex] = movevalue
+        if callLevel % 2 == 0:
+            return max(scorebook, key = scorebook.get), max(scorebook.values())
         else:
-            newbook = {i: scorebook[i][:] for i in scorebook
-                if scorebook[i] not in (10,0,-10)}
-            for newMoveIndex, newcopiedBoard in newbook.items():
-                newbook[newMoveIndex] = self.minimaxAlgo(oppoMove,
-                    newcopiedBoard, callLevel + 1)
-            if callLevel % 2 == 0:
-                return max(newbook, key = lambda k: newbook[k])
-            else:
-                return min(newbook, key = lambda k: newbook[k])
+            return min(scorebook, key = scorebook.get), min(scorebook.values())
+
 
     def hardAImove(self,aiMove):
         deterministicMove = self.minimaxAlgo(aiMove, self.gameEntry)
-        self.placeMove(deterministicMove, aiMove, self.gameEntry)
+        self.placeMove(deterministicMove[0], aiMove, self.gameEntry)
         print ('Making move level "hard"')
         self.printBoard()
 
