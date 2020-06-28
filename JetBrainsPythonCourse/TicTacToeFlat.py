@@ -1,6 +1,6 @@
 import random
 
-acceptable_input = ('user', 'easy', 'medium')
+acceptable_input = ('user', 'easy', 'medium', 'hard')
 
 class TicTacToe:
     borders = "-" * 9
@@ -53,25 +53,60 @@ class TicTacToe:
         print('Making move level "easy"')
         self.printBoard()
 
-    def WinningMove(self, moveNum):
-        possibleMoves = [i for i in range(9) if self.gameEntry[i] == " "]
+    def WinningMove(self, aiMove, board):
+        moveNum = 0 if aiMove == TicTacToe.moves[0] else 1
+        possibleMoves = [i for i in range(9) if board[i] == " "]
         for move in (TicTacToe.moves[moveNum],TicTacToe.moves[1 - moveNum]):
             for i in possibleMoves:
-                testEntry = self.gameEntry[:]
+                testEntry = board[:]
                 self.placeMove(i, move, testEntry)
                 if self.isWinner(move, testEntry):
-                    return i
+                    return i, move
         else:
             return False
 
     def mediumAIMove(self, aiMove):
-        moveNum = 0 if aiMove == TicTacToe.moves[0] else 1
-        deterministicMove = self.WinningMove(moveNum)
+        deterministicMove = self.WinningMove(aiMove, self.gameEntry)
         if deterministicMove == False:
             self.randomMove(aiMove)
         else:
-            self.placeMove(deterministicMove, aiMove, self.gameEntry)
+            self.placeMove(deterministicMove[0], aiMove, self.gameEntry)
         print ('Making move level "medium"')
+        self.printBoard()
+
+    def minimaxAlgo(self, aiMove, board, callLevel = 0):
+        oppoMove = "O" if aiMove == "X" else "X"
+        scorebook = {i: board[:] for i in range(9) if board[i] == " "}
+        for moveIndex, copiedBoard in scorebook.items():
+            copiedBoard[moveIndex] = aiMove
+            if self.isWinner(aiMove, copiedBoard):
+                scorebook[moveIndex] = 10
+            elif self.isWinner(oppoMove, copiedBoard):
+                scorebook[moveIndex] = -10
+            elif self.isDraw(copiedBoard):
+                scorebook[moveIndex] = 0
+
+        #base case
+        if all(value in (10,0,-10) for value in scorebook.values()):
+            if callLevel % 2 == 0:
+                return max(scorebook, key = lambda k: scorebook[k])
+            else:
+                return min(scorebook, key = lambda k: scorebook[k])
+        else:
+            newbook = {i: scorebook[i][:] for i in scorebook
+                if scorebook[i] not in (10,0,-10)}
+            for newMoveIndex, newcopiedBoard in newbook.items():
+                newbook[newMoveIndex] = self.minimaxAlgo(oppoMove,
+                    newcopiedBoard, callLevel + 1)
+            if callLevel % 2 == 0:
+                return max(newbook, key = lambda k: newbook[k])
+            else:
+                return min(newbook, key = lambda k: newbook[k])
+
+    def hardAImove(self,aiMove):
+        deterministicMove = self.minimaxAlgo(aiMove, self.gameEntry)
+        self.placeMove(deterministicMove, aiMove, self.gameEntry)
+        print ('Making move level "hard"')
         self.printBoard()
 
     def isWinner(self, move, board):
@@ -80,13 +115,14 @@ class TicTacToe:
             board[:9:4], board[2:7:2]]
         if [move, move, move] in winningCondition:
             return True
+        return False
 
-    def isDraw(self):
-        return all([entry in TicTacToe.moves for entry in self.gameEntry])
+    def isDraw(self, board):
+        return all([entry in TicTacToe.moves for entry in board])
 
     def playGame(self):
         corresponding_moves = (self.promptEntry, self.easyAIMove,
-            self.mediumAIMove)
+            self.mediumAIMove, self.hardAImove)
         menu = dict(zip(acceptable_input, corresponding_moves))
         i = 0
         gameMoves = (menu[self.player1], menu[self.player2])
@@ -97,7 +133,7 @@ class TicTacToe:
             if self.isWinner(move, self.gameEntry):
                 print(move, "wins")
                 self.game_active = False
-            elif self.isDraw():
+            elif self.isDraw(self.gameEntry):
                 print ("Draw")
                 self.game_active = False
             i = 1 - i
